@@ -1,14 +1,5 @@
-{-# LANGUAGE DataKinds #-}
-{-# LANGUAGE TypeOperators #-}
-{-# LANGUAGE GeneralizedNewtypeDeriving #-}
-
-{-# LANGUAGE OverloadedStrings #-}
-{-# LANGUAGE ExtendedDefaultRules #-}
-
 module Main where
 
-import Prelude
-import Data.Text
 import Servant
 import Network.Wai
 import Network.Wai.Handler.Warp
