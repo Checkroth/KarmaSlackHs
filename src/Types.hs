@@ -32,19 +32,12 @@ data IncomingRequest = IncomingRequest {
 
 instance FromJSON IncomingRequest
 
--- Expression Problem? Or something else
--- + Flesh out these records for each command
-data Help
-
-data Init
-
-data Positive
-
-data Negative
-
-data UserTotal
-
-data TeamTotal
+data Command = Help
+             | Init
+             | Positive Integer String String
+             | Negative Integer String String
+             | UserTotal String String
+             | TeamTotal String String
 
 data WebhookResponse = WebhookResponse {
   rtext :: String,
