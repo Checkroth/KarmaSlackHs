@@ -32,12 +32,12 @@ data IncomingRequest = IncomingRequest {
 
 instance FromJSON IncomingRequest
 
-data Command = Help
-             | Init
-             | Positive Integer String String
-             | Negative Integer String String
-             | UserTotal String String
-             | TeamTotal String String
+data SlackCommand = Help
+                  | Init
+                  | Positive Integer String String
+                  | Negative Integer String String
+                  | UserTotal String String
+                  | TeamTotal String
 
 data WebhookResponse = WebhookResponse {
   rtext :: String,

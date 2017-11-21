@@ -22,6 +22,17 @@ karmas =
 server :: Pipe -> Server Routes
 server pipe hoge = return karmas
 
+parseCommand :: String -> SlackCommand
+parseCommand arg = Help
+
+runCommand :: SlackCommand -> IO ()
+runCommand Help = return ()
+runCommand Init = return ()
+runCommand (Positive amount username teamname) = return ()
+runCommand (Negative amount username teamname) = return ()
+runCommand (UserTotal username teamname) = return ()
+runCommand (TeamTotal teamname) = return ()
+
 app :: Pipe -> Application
 app pipe = serve karmaApi $ server pipe
 
