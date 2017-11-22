@@ -19,19 +19,29 @@ karmas =
   , Karma "teamtwo" "karmatwo" 1
   ]
 
-server :: Pipe -> Server Routes
-server pipe hoge = return karmas
+karma = Karma "team" "user" 100
 
-parseCommand :: String -> SlackCommand
+--server :: Pipe -> Server Routes -- Cleaner typing style for later refactoring
+server :: Pipe -> IncomingRequest -> Handler WebhookResponse
+server pipe req =
+  mongoWrite command
+  return $ buildResult command
+  where
+    command = parseCommand req
+
+parseCommand :: IncomingRequest -> SlackCommand
 parseCommand arg = Help
 
-runCommand :: SlackCommand -> IO ()
-runCommand Help = return ()
-runCommand Init = return ()
-runCommand (Positive amount username teamname) = return ()
-runCommand (Negative amount username teamname) = return ()
-runCommand (UserTotal username teamname) = return ()
-runCommand (TeamTotal teamname) = return ()
+buildResult :: SlackCommand -> IO WebhookResponse
+buildResult cmd = WebhookResponse "test" "somechannel" "someuser"
+
+mongoWrite :: SlackCommand -> IO ()
+mongoWrite Help = return ()
+mongoWrite Init = return ()
+mongoWrite (Positive amount username teamname) = return ()
+mongoWrite (Negative amount username teamname) = return ()
+mongoWrite (UserTotal username teamname) = return ()
+mongoWrite (TeamTotal teamname) = return ()
 
 app :: Pipe -> Application
 app pipe = serve karmaApi $ server pipe
