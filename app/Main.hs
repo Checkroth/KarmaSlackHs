@@ -13,27 +13,19 @@ import Api
 import Env
 import qualified Configuration.Dotenv as Dotenv
 
-karmas :: [Karma]
-karmas =
-  [ Karma "teamone" "userone" 100
-  , Karma "teamtwo" "karmatwo" 1
-  ]
-
-karma = Karma "team" "user" 100
-
 --server :: Pipe -> Server Routes -- Cleaner typing style for later refactoring
 server :: Pipe -> IncomingRequest -> Handler WebhookResponse
 server pipe req =
-  mongoWrite command
+  return res
+  where
+    res = WebhookResponse "test" "somechannel" "someuser"
+{-  mongoWrite command
   return $ buildResult command
   where
     command = parseCommand req
-
+-}
 parseCommand :: IncomingRequest -> SlackCommand
 parseCommand arg = Help
-
-buildResult :: SlackCommand -> IO WebhookResponse
-buildResult cmd = WebhookResponse "test" "somechannel" "someuser"
 
 mongoWrite :: SlackCommand -> IO ()
 mongoWrite Help = return ()
@@ -49,6 +41,6 @@ app pipe = serve karmaApi $ server pipe
 main :: IO ()
 main = do
   EnvVars{..} <- getEnvVars ".env"
-  pipe <- connect (Host dbEndpoint (PortNumber 26762)) -- Issue with Num vs Int etc.
+  pipe <- connect (Host dbEndpoint (PortNumber (fromInteger portNum)))
   authenticated <- access pipe master dbName $ auth dbUsr dbPass
-  run 8081 $ app pipe
+  run serverPort $ app pipe
