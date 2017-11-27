@@ -38,6 +38,7 @@ data SlackCommand = Help
                   | Negative Integer String String
                   | UserTotal String String
                   | TeamTotal String
+                  | Invalid
 
 data WebhookResponse = WebhookResponse {
   rtext :: String,
