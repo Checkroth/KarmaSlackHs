@@ -17,29 +17,29 @@ import qualified Configuration.Dotenv as Dotenv
 --server :: Pipe -> Server Routes -- Cleaner typing style for later refactoring
 server :: Pipe -> IncomingRequest -> Handler WebhookResponse
 server pipe req =
-  liftIO $ dothing req
+  liftIO $ handler req
 
-dothing :: IncomingRequest -> IO WebhookResponse
-dothing req = do
+handler :: IncomingRequest -> IO WebhookResponse
+handler req = do
   mongoWrite command
   res <- readResult command
   return $ WebhookResponse res (channel_name(req)) (user_name(req))
   where
-    command = parseRequest req
+    command = parseCommand (words $ text(req)) (channel_name(req))
 
-doio :: SlackCommand -> IO String
-doio cmd = return "somestring"
-
-parseRequest :: IncomingRequest -> SlackCommand
-parseRequest req =  parseCommand (words $ text(req)) (channel_name(req)) (user_name(req))
-
-parseCommand :: [String] -> String -> String -> SlackCommand
-parseCommand [_, "help"] _ _ = Help
-parseCommand [_, "!all"] team _ = TeamTotal team
--- guard or pattern match for string containing all one character
---parseCommand [_, target, opscount] team user =
---  | "+":_Positive 1 team user
-parseCommand _ _ _ = Invalid
+parseCommand :: [String] -> String -> SlackCommand
+parseCommand [_, "help"] _ = Help
+parseCommand [_, "!all"] team = TeamTotal team
+parseCommand [_, target, pos@('+':_)] team =
+  Positive count team target
+  where
+    count = length $ takeWhile (== '+') pos
+parseCommand [_, target, neg@('-':_)] team =
+  Negative count team target
+  where
+    count = length $ takeWhile (== '-') neg
+parseCommand [_, target] team = UserTotal target team
+parseCommand _ _ = Invalid
 
 mongoWrite :: SlackCommand -> IO ()
 mongoWrite Help = return ()
