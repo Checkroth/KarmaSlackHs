@@ -32,7 +32,7 @@ data IncomingRequest = IncomingRequest {
 
 instance FromJSON IncomingRequest
 
-data SlackCommand = Help
+data SlackCommand = Help String
                   | Init -- Init is a different endpoint I think
                   | Positive Int String String
                   | Negative Int String String
