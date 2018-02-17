@@ -1,5 +1,6 @@
 {-# LANGUAGE DeriveGeneric #-}
 {-# LANGUAGE OverloadedStrings #-}
+{-# LANGUAGE Rank2Types #-}
 
 module Types where
 
@@ -7,6 +8,10 @@ import Data.Aeson.Types
 import Data.Aeson (ToJSON)
 import GHC.Generics
 import Data.Text (Text)
+import Control.Monad.IO.Class (MonadIO)
+import Database.MongoDB (Action)
+
+type MongoExec m a = MonadIO m => Action m a -> m a
 
 -- This needs to be BSON not JSON
 data Karma = Karma {

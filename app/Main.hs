@@ -1,4 +1,5 @@
 {-# LANGUAGE RecordWildCards #-}
+{-# LANGUAGE Rank2Types #-}
 
 module Main where
 
@@ -11,20 +12,22 @@ import Database.MongoDB
 import Types
 import Api
 import Env
+import Mongo
 import Control.Monad.IO.Class (MonadIO, liftIO)
 import qualified Configuration.Dotenv as Dotenv
 
 
 --server :: Pipe -> Server Routes -- Cleaner typing style for later refactoring
 -- Pipe - Should certainly use some control Monad instead of tossing it around like this
-server :: Pipe -> IncomingRequest -> Handler WebhookResponse
+
+server :: MongoExec m a -> IncomingRequest -> Handler WebhookResponse
 server pipe req =
   liftIO $ handler req pipe
 
-handler :: IncomingRequest -> Pipe -> IO WebhookResponse
+handler :: IncomingRequest -> MongoExec m a -> IO WebhookResponse
 handler req pipe = do
   mongoWrite command pipe
-  res <- readResult command
+  res <- readResult command pipe
   return $ WebhookResponse res (channel_name(req)) (user_name(req))
   where
     command = parseCommand (tail $ words $ text(req)) (channel_name(req))
@@ -43,18 +46,8 @@ parseCommand [target@('@':_), neg@('-':_)] team =
 parseCommand [target@('@':_)] team = UserTotal target team
 parseCommand _ _ = Invalid
 
-mongoWrite :: SlackCommand -> Pipe -> IO String
-mongoWrite (Help trigger) _ = return "dummy"
-mongoWrite Init _ = return "dummy"
-mongoWrite (Positive amount username teamname) pipe = do
-  return "dummy"
-mongoWrite (Negative amount username teamname) _ = return "dummy"
-mongoWrite (UserTotal username teamname) _ = return "dummy"
-mongoWrite (TeamTotal teamname) _ = return "dummy"
-mongoWrite Invalid _ = return "dummy"
-
-readResult :: SlackCommand -> IO String
-readResult (Help trigger) =
+readResult :: SlackCommand -> MongoExec m a -> IO String
+readResult (Help trigger) _ =
   return helpMessage
   where
     helpMessage = unlines ["How to use karma:",
@@ -66,10 +59,13 @@ readResult (Help trigger) =
                            " \"incomingWebhookUrl\": \" https://hooks.slack.com/service/my/incomingwebhook\",",
                            " \"outgoingToken\": \"myoutgoingtokens\"",
                            " }"]
+readResult Init _ = return "Init functionality not implemented!"
+readResult (Positive amount username teamname) pipe =
+  return "Pos command not yet implemented!"
+--readResult Negative
+readResult _ _ = return "Not implemented"
 
-readResult a = return "sometest"
-
-app :: Pipe -> Application
+app :: MongoExec m a -> Application
 app pipe = serve karmaApi $ server pipe
 
 main :: IO ()
@@ -77,5 +73,5 @@ main = do
   EnvVars{..} <- getEnvVars ".env"
   pipe <- connect (Host dbEndpoint (PortNumber (fromInteger portNum)))
   let exec act = access pipe master dbName act
-  authenticated <- exec $ auth dbUsr dbPass
-  run serverPort $ app pipe
+  exec $ auth dbUsr dbPass
+  run serverPort $ app exec
