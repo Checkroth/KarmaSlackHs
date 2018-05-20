@@ -18,11 +18,13 @@ library
   exposed-modules:     Types
                      , Api
                      , Mongo
+                     , Commands
   build-depends:       base >= 4.7 && < 5
                      , aeson
                      , servant-server
                      , text
                      , mongoDB
+                     , bson
   default-language:    Haskell2010
 
 executable karmaapi-exe

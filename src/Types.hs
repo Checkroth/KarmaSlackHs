@@ -11,7 +11,7 @@ import Data.Text (Text)
 import Control.Monad.IO.Class (MonadIO)
 import Database.MongoDB (Action)
 
-type MongoExec m a = MonadIO m => Action m a -> m a
+type MongoExec m a = (MonadIO m) => Action m a -> m a
 
 -- This needs to be BSON not JSON
 data Karma = Karma {
