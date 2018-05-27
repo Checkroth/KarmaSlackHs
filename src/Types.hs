@@ -9,9 +9,9 @@ import Data.Aeson (ToJSON)
 import GHC.Generics
 import Data.Text (Text)
 import Control.Monad.IO.Class (MonadIO)
-import Database.MongoDB (Action)
+import Database.MongoDB (Action, Document)
 
-type MongoExec m a = (MonadIO m) => Action m a -> m a
+type MongoExec = Action IO (Maybe Document) -> IO (Maybe Document)
 
 -- This needs to be BSON not JSON
 data Karma = Karma {

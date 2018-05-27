@@ -7,6 +7,7 @@ import Types
 import Database.MongoDB
 import Data.Text (Text)
 import Data.Maybe
+import Control.Monad.IO.Class (MonadIO)
 import qualified Data.Bson
 
 parseCommand :: [String] -> String -> SlackCommand
@@ -23,7 +24,7 @@ parseCommand [target@('@':_), neg@('-':_)] team =
 parseCommand [target@('@':_)] team = UserTotal target team
 parseCommand _ _ = Invalid
 
-readResult :: SlackCommand -> MongoExec m a -> IO (Maybe String)
+readResult :: SlackCommand -> MongoExec -> IO (Maybe String)
 readResult (Help trigger) _ =
   return $ Just helpMessage
   where
@@ -43,11 +44,11 @@ readResult Init _ = return $ Just "Init functionality not implemented!"
 -- Value from m Maybe Value (Bson.lookup field document :: type)
 -- Then return to Main to get operable return value
 readResult (Positive amount username teamname) pipe = do
---  userRecord <- pipe $ findOne (select ["userId" =: username] "karmas")
---  let x = fmap (valueAt "teamId") userRecord
+  userRecord <- pipe $ findOne (select ["userId" =: username] "karmas")
+  let idvalue =  fmap (valueAt "teamId") userRecord
+  return $ fmap (typed) idvalue
+--  return $ Just "not implemented"
 --  uid <- fmap (Data.Bson.lookup "userId") userRecord :: Maybe (Maybe String)
---  uid
-  return $ Just "nothing"
 
 --readResult Negative
 readResult _ _ = return $ Just "Not implemented"

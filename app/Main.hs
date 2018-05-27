@@ -23,11 +23,11 @@ import qualified Configuration.Dotenv as Dotenv
 --server :: Pipe -> Server Routes -- Cleaner typing style for later refactoring
 -- Pipe - Should certainly use some control Monad instead of tossing it around like this
 
-server :: MongoExec m a -> IncomingRequest -> Handler WebhookResponse
+server :: MongoExec -> IncomingRequest -> Handler WebhookResponse
 server pipe req =
   liftIO $ handler req pipe
 
-handler :: IncomingRequest -> MongoExec m a -> IO WebhookResponse
+handler :: IncomingRequest -> MongoExec -> IO WebhookResponse
 handler req pipe = do
 --  mongoWrite command pipe
   res <- readResult command pipe
@@ -37,7 +37,7 @@ handler req pipe = do
     command = parseCommand (tail $ words $ text(req)) (channel_name(req))
 
 
-app :: MongoExec m a -> Application
+app :: MongoExec -> Application
 app pipe = serve karmaApi $ server pipe
 
 main :: IO ()
