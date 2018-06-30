@@ -7,6 +7,7 @@ import Types
 import Database.MongoDB
 import Data.Text (Text)
 import Data.Maybe
+import Data.Bson.Generic (fromBSON)
 import Control.Monad.IO.Class (MonadIO)
 import qualified Data.Bson
 
@@ -44,9 +45,11 @@ readResult Init _ = return $ Just "Init functionality not implemented!"
 -- Value from m Maybe Value (Bson.lookup field document :: type)
 -- Then return to Main to get operable return value
 readResult (Positive amount username teamname) pipe = do
+  -- trying to us BSON generics (not working)
   userRecord <- pipe $ findOne (select ["userId" =: username] "karmas")
-  let idvalue =  fmap (valueAt "teamId") userRecord
-  return $ fmap (typed) idvalue
+  let karmarecord = fmap (fromBSON) userRecord :: Maybe Karma
+  return $ fmap (teamId) userRecord
+--  let idvalue =  fmap (valueAt "teamId") userRecord
 --  return $ Just "not implemented"
 --  uid <- fmap (Data.Bson.lookup "userId") userRecord :: Maybe (Maybe String)
 

@@ -19,12 +19,14 @@ library
                      , Api
                      , Mongo
                      , Commands
-  build-depends:       base >= 4.7 && < 5
+  build-depends:       base == 4.8.*
                      , aeson
                      , servant-server
                      , text
                      , mongoDB
                      , bson
+                     , bson-generic
+                     , transformers
   default-language:    Haskell2010
 
 executable karmaapi-exe
@@ -32,7 +34,7 @@ executable karmaapi-exe
   main-is:             Main.hs
   other-modules:       Env
   ghc-options:         -threaded -rtsopts -with-rtsopts=-N
-  build-depends:       base
+  build-depends:       base == 4.8.*
                      , karmaapi
                      , servant-server
                      , text
@@ -48,7 +50,7 @@ test-suite karmaapi-test
   type:                exitcode-stdio-1.0
   hs-source-dirs:      test
   main-is:             Spec.hs
-  build-depends:       base
+  build-depends:       base == 4.8.*
                      , karmaapi
   ghc-options:         -threaded -rtsopts -with-rtsopts=-N
   default-language:    Haskell2010

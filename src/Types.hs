@@ -6,6 +6,7 @@ module Types where
 
 import Data.Aeson.Types
 import Data.Aeson (ToJSON)
+import Data.Bson.Generic (FromBSON)
 import GHC.Generics
 import Data.Text (Text)
 import Control.Monad.IO.Class (MonadIO)
@@ -20,7 +21,7 @@ data Karma = Karma {
   karmaPoints :: Integer
   } deriving (Generic, Show)
 
-instance ToJSON Karma
+instance FromBSON Karma
 
 data IncomingRequest = IncomingRequest {
   token :: String,
